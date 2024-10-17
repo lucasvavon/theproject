@@ -1,0 +1,6 @@
+#back
+backend/target
+
+
+#front
+frontend/node_modules
