@@ -1,28 +1,36 @@
+use actix_web::{App, HttpServer, web};
 use actix_cors::Cors;
-use actix_web::{web, App, HttpServer};
-use diesel::prelude::*;
-use dotenvy::dotenv;
 use std::env;
-mod db;
+use dotenvy::dotenv;
+use sqlx::PgPool;
+
+mod controllers;
 mod models;
+mod services;
+mod repositories;
 mod routes;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
 
-    // Initialize database connection
-    let db_pool = db::init_pool();
+    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL is not set in .env");
 
-    // Start HTTP server
+    // new pool
+    let pool: PgPool = PgPool::connect(&database_url).await.expect("Failed to create pool.");
+
+    //sqlx::migrate!("./../migrations").run(&pool).await?;
+
     HttpServer::new(move || {
-        let cors = Cors::permissive();
         App::new()
-            .app_data(web::Data::new(db_pool.clone()))
-            .wrap(cors)
-            .configure(routes::init)
+            .app_data(web::Data::new(pool.clone())) // share pool to all handlers
+            .wrap(Cors::default()
+                .allow_any_origin()
+                .allowed_methods(vec!["GET", "POST", "PUT", "DELETE"])
+                .allowed_header(actix_web::http::header::CONTENT_TYPE))
+            .configure(routes::user_routes::user_routes)
     })
-    .bind("127.0.0.1:8080")?
-    .run()
-    .await
+        .bind("127.0.0.1:3030")?
+        .run()
+        .await
 }

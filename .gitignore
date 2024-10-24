@@ -1,6 +1,7 @@
 #back
 backend/target
-
+backend/migrations
+backend/.idea
 
 #front
 frontend/node_modules
