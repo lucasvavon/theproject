@@ -1,24 +1,18 @@
-# Étape 1 : Utiliser l'image de base Rust
-FROM rust:latest as builder
+# Use a base image with the latest version of Rust installed
+FROM rust:latest
 
-# Créer un répertoire de travail
-WORKDIR /usr/src/app
+# Set the working directory in the container
+WORKDIR /app
 
-# Copier le fichier de configuration et les sources
-COPY Cargo.toml Cargo.lock ./
-COPY src ./src
+ARG SQLX_OFFLINE=true
 
-# Compiler l'application
+# Copy the local application code into the container
+COPY . .
+
+# Build the Rust application
 RUN cargo build --release
 
-# Étape 2 : Préparer l'image finale
-FROM debian:buster-slim
+# Specify the command to run when the container starts
+CMD ["./target/release/backend"]
 
-# Installer les dépendances nécessaires
-RUN apt-get update && apt-get install -y libpq-dev
-
-# Copier le binaire depuis l'image de construction
-COPY --from=builder /usr/src/app/target/release/theproject /usr/local/bin/theproject
-
-# Définir la commande par défaut
-CMD ["theproject"]
+EXPOSE 3031
