@@ -1,0 +1,26 @@
+# Ignorer les dossiers de build locaux
+/target
+/docker
+/tests
+/.sqlx
+/migrations
+
+# Ignorer les dossiers de versionnement et de l’éditeur
+.git
+.gitignore
+.vscode
+.idea
+.DS_Store
+
+# Ignorer les fichiers temporaires et de logs
+**/*.log
+**/*~
+**/*.swp
+**/*.tmp
+**/.cache
+
+# Ignorer les assets et documents non nécessaires pour l’exécution
+README.md
+docs/
+assets/
+examples/
